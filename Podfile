@@ -4,7 +4,7 @@ platform :ios, '9.1'
 use_frameworks!
 
 target 'vlckitSwiftSample' do
-	pod 'MobileVLCKit'
+	pod 'MobileVLCKit', '~>3.3.12'
 end
 
 target 'vlckitSwiftSampleTests' do

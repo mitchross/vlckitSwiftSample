@@ -8,7 +8,13 @@
 
 import UIKit
 
-class ViewController: UIViewController, VLCMediaPlayerDelegate {
+@objc protocol VLCRendererDiscovererManagerDelegate {
+    @objc optional func removedCurrentRendererItem(_ item: VLCRendererItem)
+    @objc optional func addedRendererItem()
+    @objc optional func removedRendererItem()
+}
+
+class ViewController: UIViewController, VLCMediaPlayerDelegate, VLCRendererDiscovererManagerDelegate, VLCRendererDiscovererDelegate {
 
     var movieView: UIView!
 
@@ -16,9 +22,14 @@ class ViewController: UIViewController, VLCMediaPlayerDelegate {
     //var mediaPlayer: VLCMediaPlayer = VLCMediaPlayer(options: ["-vvvv"])
 
     var mediaPlayer: VLCMediaPlayer = VLCMediaPlayer()
+    var discoverers: [VLCRendererDiscoverer] = [VLCRendererDiscoverer]()
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        start()
+        getAllRenderers()
 
         //Add rotation observer
         NotificationCenter.default.addObserver(
@@ -49,7 +60,7 @@ class ViewController: UIViewController, VLCMediaPlayerDelegate {
         //let url = NSURL(string: "http://streams.videolan.org/streams/mp4/Mr_MrsSmith-h264_aac.mp4")
 
         //Playing RTSP from internet
-        let url = URL(string: "rtsp://184.72.239.149/vod/mp4:BigBuckBunny_115k.mov")
+        let url = URL(string: "http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_30fps_normal.mp4")
 
         if url == nil {
             print("Invalid URL")
@@ -107,6 +118,57 @@ class ViewController: UIViewController, VLCMediaPlayerDelegate {
         }
         
     }
+    
+    func getAllRenderers() -> [VLCRendererItem] {
+        return discoverers.flatMap { $0.renderers }
+    }
+    
+   func start() {
+    
+        // Gather potential renderer discoverers
+        guard let tmpDiscoverersDescription: [VLCRendererDiscovererDescription] = VLCRendererDiscoverer.list() else {
+            print("VLCRendererDiscovererManager: Unable to retrieve list of VLCRendererDiscovererDescription")
+            return
+        }
+        for discovererDescription in tmpDiscoverersDescription where !isDuplicateDiscoverer(with: discovererDescription) {
+            guard let rendererDiscoverer = VLCRendererDiscoverer(name: discovererDescription.name) else {
+                print("VLCRendererDiscovererManager: Unable to instanciate renderer discoverer with name: \(discovererDescription.name)")
+                continue
+            }
+            guard rendererDiscoverer.start() else {
+                print("VLCRendererDiscovererManager: Unable to start renderer discoverer with name: \(rendererDiscoverer.name)")
+                continue
+            }
+            rendererDiscoverer.delegate = self
+            discoverers.append(rendererDiscoverer)
+        }
+    }
+    
+    func isDuplicateDiscoverer(with description: VLCRendererDiscovererDescription) -> Bool {
+        for discoverer in discoverers where discoverer.name == description.name {
+            return true
+        }
+        return false
+    }
+    
+    
+    func rendererDiscovererItemDeleted(_ rendererDiscoverer: VLCRendererDiscoverer, item: VLCRendererItem) {
+        //for break points
+        var i = 1
+    }
+    
+    func rendererDiscovererItemAdded(_ rendererDiscoverer: VLCRendererDiscoverer, item: VLCRendererItem) {
+        //for break points
+        var i = 1
+        }
+
+      
+        
+    
+   
+    
+
+
 
 
 }
