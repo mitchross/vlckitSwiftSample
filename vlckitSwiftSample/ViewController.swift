@@ -23,8 +23,7 @@ class ViewController: UIViewController, VLCMediaPlayerDelegate, VLCRendererDisco
 
     var mediaPlayer: VLCMediaPlayer = VLCMediaPlayer()
     var discoverers: [VLCRendererDiscoverer] = [VLCRendererDiscoverer]()
-
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -124,13 +123,15 @@ class ViewController: UIViewController, VLCMediaPlayerDelegate, VLCRendererDisco
     }
     
    func start() {
-    
+        
+        /*
         // Gather potential renderer discoverers
         guard let tmpDiscoverersDescription: [VLCRendererDiscovererDescription] = VLCRendererDiscoverer.list() else {
             print("VLCRendererDiscovererManager: Unable to retrieve list of VLCRendererDiscovererDescription")
             return
         }
         for discovererDescription in tmpDiscoverersDescription where !isDuplicateDiscoverer(with: discovererDescription) {
+            print(discovererDescription.name)
             guard let rendererDiscoverer = VLCRendererDiscoverer(name: discovererDescription.name) else {
                 print("VLCRendererDiscovererManager: Unable to instanciate renderer discoverer with name: \(discovererDescription.name)")
                 continue
@@ -141,7 +142,19 @@ class ViewController: UIViewController, VLCMediaPlayerDelegate, VLCRendererDisco
             }
             rendererDiscoverer.delegate = self
             discoverers.append(rendererDiscoverer)
+        }*/
+    
+        guard let rendererDiscoverer = VLCRendererDiscoverer(name: "Bonjour_renderer")
+        else {
+            print("VLCRendererDiscovererManager: Unable to instanciate renderer discoverer with name: Bonjour_renderer")
+            return
         }
+        guard rendererDiscoverer.start() else {
+            print("VLCRendererDiscovererManager: Unable to start renderer discoverer with name: Bonjour_renderer")
+            return
+        }
+        rendererDiscoverer.delegate = self
+        discoverers.append(rendererDiscoverer)
     }
     
     func isDuplicateDiscoverer(with description: VLCRendererDiscovererDescription) -> Bool {
@@ -154,11 +167,13 @@ class ViewController: UIViewController, VLCMediaPlayerDelegate, VLCRendererDisco
     
     func rendererDiscovererItemDeleted(_ rendererDiscoverer: VLCRendererDiscoverer, item: VLCRendererItem) {
         //for break points
+        print(item.name)
         var i = 1
     }
     
     func rendererDiscovererItemAdded(_ rendererDiscoverer: VLCRendererDiscoverer, item: VLCRendererItem) {
         //for break points
+        print(item.name)
         var i = 1
         }
 
