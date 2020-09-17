@@ -24,7 +24,7 @@ class ViewController: UIViewController, VLCMediaPlayerDelegate, VLCRendererDisco
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        start()
+        start(delegate: self)
         getAllRenderers()
 
         //Add rotation observer
@@ -119,7 +119,7 @@ class ViewController: UIViewController, VLCMediaPlayerDelegate, VLCRendererDisco
         return discoverers.flatMap { $0.renderers }
     }
     
-   func start() {
+    func start(delegate: VLCRendererDiscovererDelegate) {
 
     
         guard let rendererDiscoverer = VLCRendererDiscoverer(name: "Bonjour_renderer")
@@ -131,7 +131,9 @@ class ViewController: UIViewController, VLCMediaPlayerDelegate, VLCRendererDisco
             print("VLCRendererDiscovererManager: Unable to start renderer discoverer with name: Bonjour_renderer")
             return
         }
-        rendererDiscoverer.delegate = self
+        rendererDiscoverer.delegate = delegate
+
+        //this must get called or no items returned
         discoverers.append(rendererDiscoverer)
     }
     
